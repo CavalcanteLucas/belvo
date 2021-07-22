@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "belvo.users.apps.UsersConfig",
+    "belvo.transactions.apps.TransactionsConfig",
 ]
 
 MIDDLEWARE = [
