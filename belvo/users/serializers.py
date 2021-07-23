@@ -41,3 +41,9 @@ class BalanceSerializer(serializers.Serializer):
             .aggregate(Sum("amount"))["amount__sum"]
             or 0
         )
+
+
+class SummarySerializer(serializers.Serializer):
+    type = serializers.CharField(max_length=6)
+    category = serializers.CharField(max_length=20)
+    amount = serializers.DecimalField(max_digits=8, decimal_places=2)
