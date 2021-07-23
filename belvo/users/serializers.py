@@ -19,28 +19,31 @@ class BalanceSerializer(serializers.Serializer):
     total_outflow = serializers.SerializerMethodField()
 
     def get_balance(self, obj):
-        return (
+        balance = (
             Transaction.objects.filter(account=obj.account).aggregate(Sum("amount"))[
                 "amount__sum"
             ]
             or 0
         )
+        return "%.2f" % balance
 
     def get_total_inflow(self, obj):
-        return (
+        total_inflow = (
             Transaction.objects.filter(account=obj.account)
             .filter(type=TransactionTypes.INFLOW)
             .aggregate(Sum("amount"))["amount__sum"]
             or 0
         )
+        return "%.2f" % total_inflow
 
     def get_total_outflow(self, obj):
-        return (
+        total_outflow = (
             Transaction.objects.filter(account=obj.account)
             .filter(type=TransactionTypes.OUTFLOW)
             .aggregate(Sum("amount"))["amount__sum"]
             or 0
         )
+        return "%.2f" % total_outflow
 
 
 class SummarySerializer(serializers.Serializer):
