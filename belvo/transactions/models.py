@@ -1,6 +1,4 @@
 from django.db import models
-from django.db.models.constraints import UniqueConstraint
-from django.db.models.expressions import CombinedExpression, F
 
 from belvo.users.models import User
 
