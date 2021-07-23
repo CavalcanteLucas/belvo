@@ -25,13 +25,5 @@ class TransactionListSerializer(serializers.ListSerializer):
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
-        fields = [
-            "reference",
-            "account",
-            "date",
-            "amount",
-            "type",
-            "category",
-            "user_id",
-        ]
+        fields = "__all__"
         list_serializer_class = TransactionListSerializer

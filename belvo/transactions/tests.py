@@ -75,6 +75,7 @@ class TransactionTests(TestCase):
         self.assertEqual(1, Transaction.objects.count())
 
         expected_data = {
+            "id": 1,
             "reference": transaction_sample.reference,
             "account": transaction_sample.account,
             "date": str(transaction_sample.date),
@@ -147,8 +148,12 @@ class TransactionTests(TestCase):
 
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
         self.assertEqual(2, Transaction.objects.count())
+        self.assertEqual(2, len(response.data))
 
-        self.assertEqual(transactions_bulk_sample, response.data)
+        for transaction in transactions_bulk_sample:
+            self.assertEqual(
+                1, len(Transaction.objects.filter(reference=transaction["reference"]))
+            )
 
     def test_create_bulk_transactions_successfully_even_with_repeated_transactions(
         self,
@@ -188,8 +193,12 @@ class TransactionTests(TestCase):
 
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
         self.assertEqual(1, Transaction.objects.count())
+        self.assertEqual(1, len(response.data))
 
-        self.assertEqual([transactions_bulk_sample[0]], response.data)
+        for transaction in transactions_bulk_sample:
+            self.assertEqual(
+                1, len(Transaction.objects.filter(reference=transaction["reference"]))
+            )
 
     def test_create_bulk_transactions_ignore_conflicts_with_saved_data(self):
         user = baker.make("users.User")

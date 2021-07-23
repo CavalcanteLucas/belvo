@@ -22,6 +22,7 @@ class UserTests(TestCase):
 
         expected_data = [
             {
+                "id": 1,
                 "name": user.name,
                 "email": user.email,
                 "age": user.age,
@@ -44,6 +45,7 @@ class UserTests(TestCase):
         self.assertEqual(1, User.objects.count())
 
         expected_data = {
+            "id": 1,
             "name": user_sample.name,
             "email": user_sample.email,
             "age": user_sample.age,
