@@ -1,8 +1,7 @@
-from django.shortcuts import render
 from rest_framework import generics
 
-from .models import User
-from .serializers import UserSerializer
+from belvo.users.models import User
+from belvo.users.serializers import UserSerializer
 
 
 class UserListAPIView(generics.ListCreateAPIView):

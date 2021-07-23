@@ -17,8 +17,10 @@ from django.contrib import admin
 from django.urls import path, include
 
 from belvo.users import urls as users_endpoints
+from belvo.transactions import urls as transactions_endpoints
 
 urlpatterns = [
     path("api/users/", include(users_endpoints)),
+    path("api/transactions/", include(transactions_endpoints)),
     path("admin/", admin.site.urls),
 ]

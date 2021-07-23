@@ -5,8 +5,8 @@ from belvo.users.models import User
 
 
 class TransactionTypes(models.TextChoices):
-    INFLOW = "IN", "inflow"
-    OUTFLOW = "OU", "outflow"
+    INFLOW = "inflow", "inflow"
+    OUTFLOW = "outflow", "outflow"
 
 
 class Transaction(models.Model):
@@ -27,8 +27,8 @@ class Transaction(models.Model):
             models.CheckConstraint(
                 name="inflow_positive_or_outflow_negative",
                 check=(
-                    models.Q(type="IN", amount__gte=0)
-                    | models.Q(type="OU", amount__lt=0)
+                    models.Q(type=TransactionTypes.INFLOW, amount__gte=0)
+                    | models.Q(type=TransactionTypes.OUTFLOW, amount__lt=0)
                 ),
             ),
         ]
