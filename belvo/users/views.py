@@ -67,4 +67,4 @@ class UserSummaryAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         user_id = self.kwargs["pk"]
-        return Transaction.objects.filter(user_id=user_id).order_by('category')
+        return Transaction.objects.filter(user_id=user_id).order_by("category")

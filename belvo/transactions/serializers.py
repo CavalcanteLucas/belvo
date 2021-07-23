@@ -6,13 +6,15 @@ from belvo.transactions.models import Transaction
 class TransactionListSerializer(serializers.ListSerializer):
     def create(self, validated_data):
         unique_references = list(
-            {
-                transaction["reference"]: transaction for transaction in validated_data
-            }
+            {transaction["reference"]: transaction for transaction in validated_data}
         )
 
         transactions = [
-            next(transaction for transaction in validated_data if transaction["reference"] == reference)
+            next(
+                transaction
+                for transaction in validated_data
+                if transaction["reference"] == reference
+            )
             for reference in unique_references
         ]
 
