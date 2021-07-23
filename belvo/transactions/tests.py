@@ -86,6 +86,31 @@ class TransactionTests(TestCase):
 
         self.assertEqual(expected_data, response.data)
 
+    def test_cant_create_transactions_with_repeated_reference(self):
+        user = baker.make("users.User")
+
+        self.assertEqual(0, Transaction.objects.count())
+
+        transaction_sample = baker.make(
+            "Transaction",
+            reference="000051",
+            type=TransactionTypes.INFLOW,
+            amount="1.99",
+            user_id=user,
+        )
+
+        url = reverse("transactions:transaction")
+
+        with self.assertRaises(IntegrityError):
+            response = self.client.post(
+                path=url,
+                content_type="application/json",
+                data=TransactionSerializer(transaction_sample).data,
+            )
+            self.assertEqual(
+                status.HTTP_500_INTERNAL_SERVER_ERROR, response.status_code
+            )
+
     def test_create_bulk_transactions_successfully(self):
         baker.make("users.User")
 
@@ -164,4 +189,222 @@ class TransactionTests(TestCase):
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
         self.assertEqual(1, Transaction.objects.count())
 
-        self.assertEqual(transactions_bulk_sample, response.data)
+        self.assertEqual([transactions_bulk_sample[0]], response.data)
+
+    def test_create_bulk_transactions_ignore_conflicts_with_saved_data(self):
+        user = baker.make("users.User")
+
+        self.assertEqual(0, Transaction.objects.count())
+
+        transaction_sample = {
+            "reference": "000052",
+            "account": "C00099",
+            "date": "2020-01-10",
+            "amount": "2500.72",
+            "type": "inflow",
+            "category": "salary",
+            "user_id": user.id,
+        }
+
+        baker.make(
+            "Transaction",
+            reference=transaction_sample["reference"],
+            account=transaction_sample["account"],
+            date=transaction_sample["date"],
+            amount=transaction_sample["amount"],
+            type=transaction_sample["type"],
+            category=transaction_sample["category"],
+            user_id=user,
+        )
+
+        self.assertEqual(1, Transaction.objects.count())
+
+        url = reverse("transactions:transaction")
+        response = self.client.post(
+            path=url,
+            content_type="application/json",
+            data=[transaction_sample],
+        )
+
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+        self.assertEqual([], response.data)
+
+    def test_create_bulk_transactions_ignore_conflicts_within_bulk(self):
+        baker.make("users.User")
+
+        self.assertEqual(0, Transaction.objects.count())
+
+        transactions_bulk_sample = [
+            {
+                "reference": "000051",
+                "account": "C00099",
+                "date": "2020-01-03",
+                "amount": "-51.13",
+                "type": "outflow",
+                "category": "groceries",
+                "user_id": 1,
+            },
+            {
+                "reference": "000052",
+                "account": "C00099",
+                "date": "2020-01-10",
+                "amount": "2500.72",
+                "type": "inflow",
+                "category": "salary",
+                "user_id": 1,
+            },
+            {
+                "reference": "000053",
+                "account": "C00099",
+                "date": "2020-01-10",
+                "amount": "-150.72",
+                "type": "outflow",
+                "category": "transfer",
+                "user_id": 1,
+            },
+            {
+                "reference": "000054",
+                "account": "C00099",
+                "date": "2020-01-13",
+                "amount": "-560.00",
+                "type": "outflow",
+                "category": "rent",
+                "user_id": 1,
+            },
+            {
+                "reference": "000051",
+                "account": "C00099",
+                "date": "2020-01-04",
+                "amount": "-51.13",
+                "type": "outflow",
+                "category": "other",
+                "user_id": 1,
+            },
+            {
+                "reference": "000689",
+                "account": "S00012",
+                "date": "2020-01-10",
+                "amount": "150.72",
+                "type": "inflow",
+                "category": "savings",
+                "user_id": 1,
+            },
+        ]
+
+        url = reverse("transactions:transaction")
+        response = self.client.post(
+            path=url,
+            content_type="application/json",
+            data=transactions_bulk_sample,
+        )
+
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+        self.assertEqual(5, len(response.data))
+        self.assertEqual(5, Transaction.objects.count())
+
+        for transaction in transactions_bulk_sample:
+            self.assertEqual(
+                1, len(Transaction.objects.filter(reference=transaction["reference"]))
+            )
+
+    def test_create_bulk_transactions_ignore_conflicts_within_bulk_and_saved_data(self):
+
+        user = baker.make("users.User")
+
+        self.assertEqual(0, Transaction.objects.count())
+
+        transaction_sample = {
+            "reference": "000051",
+            "account": "C00099",
+            "date": "2020-01-03",
+            "amount": "-51.13",
+            "type": "outflow",
+            "category": "groceries",
+            "user_id": 1,
+        }
+
+        baker.make(
+            "Transaction",
+            reference=transaction_sample["reference"],
+            account=transaction_sample["account"],
+            date=transaction_sample["date"],
+            amount=transaction_sample["amount"],
+            type=transaction_sample["type"],
+            category=transaction_sample["category"],
+            user_id=user,
+        )
+
+        self.assertEqual(1, Transaction.objects.count())
+
+        transactions_bulk_sample = [
+            {
+                "reference": "000051",
+                "account": "C00099",
+                "date": "2020-01-03",
+                "amount": "-51.13",
+                "type": "outflow",
+                "category": "groceries",
+                "user_id": 1,
+            },
+            {
+                "reference": "000052",
+                "account": "C00099",
+                "date": "2020-01-10",
+                "amount": "2500.72",
+                "type": "inflow",
+                "category": "salary",
+                "user_id": 1,
+            },
+            {
+                "reference": "000053",
+                "account": "C00099",
+                "date": "2020-01-10",
+                "amount": "-150.72",
+                "type": "outflow",
+                "category": "transfer",
+                "user_id": 1,
+            },
+            {
+                "reference": "000054",
+                "account": "C00099",
+                "date": "2020-01-13",
+                "amount": "-560.00",
+                "type": "outflow",
+                "category": "rent",
+                "user_id": 1,
+            },
+            {
+                "reference": "000051",
+                "account": "C00099",
+                "date": "2020-01-04",
+                "amount": "-51.13",
+                "type": "outflow",
+                "category": "other",
+                "user_id": 1,
+            },
+            {
+                "reference": "000689",
+                "account": "S00012",
+                "date": "2020-01-10",
+                "amount": "150.72",
+                "type": "inflow",
+                "category": "savings",
+                "user_id": 1,
+            },
+        ]
+
+        url = reverse("transactions:transaction")
+        response = self.client.post(
+            path=url,
+            content_type="application/json",
+            data=transactions_bulk_sample,
+        )
+
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+        self.assertEqual(4, len(response.data))
+        self.assertEqual(5, Transaction.objects.count())
+
+        for transaction in transactions_bulk_sample:
+            self.assertEqual(
+                1, len(Transaction.objects.filter(reference=transaction["reference"]))
+            )

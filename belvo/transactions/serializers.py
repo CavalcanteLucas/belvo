@@ -1,14 +1,25 @@
 from rest_framework import serializers
 
-from django.db.utils import IntegrityError
-
 from belvo.transactions.models import Transaction
 
 
 class TransactionListSerializer(serializers.ListSerializer):
     def create(self, validated_data):
-        transactions = [Transaction(**item) for item in validated_data]
-        return Transaction.objects.bulk_create(transactions, ignore_conflicts=True)
+        unique_reference_transactions = list(
+            {
+                transaction["reference"]: transaction for transaction in validated_data
+            }.values()
+        )
+
+        new_transactions = [
+            Transaction(**transaction)
+            for transaction in unique_reference_transactions
+            if not Transaction.objects.filter(
+                reference=transaction["reference"]
+            ).exists()
+        ]
+
+        return Transaction.objects.bulk_create(new_transactions, ignore_conflicts=True)
 
 
 class TransactionSerializer(serializers.ModelSerializer):
