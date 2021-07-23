@@ -5,15 +5,20 @@ from belvo.transactions.models import Transaction
 
 class TransactionListSerializer(serializers.ListSerializer):
     def create(self, validated_data):
-        unique_reference_transactions = list(
+        unique_references = list(
             {
                 transaction["reference"]: transaction for transaction in validated_data
-            }.values()
+            }
         )
+
+        transactions = [
+            next(transaction for transaction in validated_data if transaction["reference"] == reference)
+            for reference in unique_references
+        ]
 
         new_transactions = [
             Transaction(**transaction)
-            for transaction in unique_reference_transactions
+            for transaction in transactions
             if not Transaction.objects.filter(
                 reference=transaction["reference"]
             ).exists()
