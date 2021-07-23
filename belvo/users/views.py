@@ -23,6 +23,18 @@ class UserDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 class UserBalanceAPIView(generics.ListAPIView):
     serializer_class = BalanceSerializer
 
+    def get_result(self, data):
+        result = list(
+            {transaction["account"]: transaction for transaction in data}.values()
+        )
+        return result
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(self.get_result(serializer.data))
+
     def get_queryset(self):
         user_id = self.kwargs["pk"]
         return Transaction.objects.filter(user_id=user_id)
