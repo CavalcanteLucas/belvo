@@ -64,6 +64,7 @@ class TransactionTests(TestCase):
         )
 
         url = reverse("transactions:transaction")
+
         response = self.client.post(
             path=url,
             content_type="application/json",
@@ -84,3 +85,83 @@ class TransactionTests(TestCase):
         }
 
         self.assertEqual(expected_data, response.data)
+
+    def test_create_bulk_transactions_successfully(self):
+        baker.make("users.User")
+
+        self.assertEqual(0, Transaction.objects.count())
+
+        transactions_bulk_sample = [
+            {
+                "reference": "000052",
+                "account": "C00099",
+                "date": "2020-01-10",
+                "amount": "2500.72",
+                "type": "inflow",
+                "category": "salary",
+                "user_id": 1,
+            },
+            {
+                "reference": "000053",
+                "account": "C00099",
+                "date": "2020-01-10",
+                "amount": "-150.72",
+                "type": "outflow",
+                "category": "transfer",
+                "user_id": 1,
+            },
+        ]
+
+        url = reverse("transactions:transaction")
+
+        response = self.client.post(
+            path=url,
+            content_type="application/json",
+            data=transactions_bulk_sample,
+        )
+
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+        self.assertEqual(2, Transaction.objects.count())
+
+        self.assertEqual(transactions_bulk_sample, response.data)
+
+    def test_create_bulk_transactions_successfully_even_with_repeated_transactions(
+        self,
+    ):
+        baker.make("users.User")
+
+        self.assertEqual(0, Transaction.objects.count())
+
+        transactions_bulk_sample = [
+            {
+                "reference": "000052",
+                "account": "C00099",
+                "date": "2020-01-10",
+                "amount": "2500.72",
+                "type": "inflow",
+                "category": "salary",
+                "user_id": 1,
+            },
+            {
+                "reference": "000052",
+                "account": "C00099",
+                "date": "2020-01-10",
+                "amount": "2500.72",
+                "type": "inflow",
+                "category": "salary",
+                "user_id": 1,
+            },
+        ]
+
+        url = reverse("transactions:transaction")
+
+        response = self.client.post(
+            path=url,
+            content_type="application/json",
+            data=transactions_bulk_sample,
+        )
+
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+        self.assertEqual(1, Transaction.objects.count())
+
+        self.assertEqual(transactions_bulk_sample, response.data)

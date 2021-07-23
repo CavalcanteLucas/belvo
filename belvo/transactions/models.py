@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models.constraints import UniqueConstraint
 from django.db.models.expressions import CombinedExpression, F
 
 from belvo.users.models import User
@@ -10,7 +11,7 @@ class TransactionTypes(models.TextChoices):
 
 
 class Transaction(models.Model):
-    reference = models.CharField(max_length=6, unique=True)
+    reference = models.CharField(max_length=6)
     account = models.CharField(max_length=6)
     date = models.DateField()
     amount = models.DecimalField(max_digits=8, decimal_places=2)
@@ -20,6 +21,10 @@ class Transaction(models.Model):
 
     class Meta:
         constraints = [
+            models.UniqueConstraint(
+                name="only_one_reference",
+                fields=["reference"],
+            ),
             models.CheckConstraint(
                 name="only_two_types_of_transaction",
                 check=models.Q(type__in=TransactionTypes.values),
