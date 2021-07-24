@@ -9,7 +9,7 @@
 - Clone the repository
 - Create a virtual environment running Python 3.8
 - Activate the virtual environment
-- Install the project dependencies dependencies
+- Install the project dependencies
 ```
 pip install -r requirements.txt
 ```
