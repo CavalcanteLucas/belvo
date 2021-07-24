@@ -79,10 +79,10 @@ WSGI_APPLICATION = "belvo.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": "postgres",
+        "NAME": "belvo",
         "USER": "postgres",
         "PASSWORD": "postgres",
-        "HOST": "db",
+        "HOST": "localhost",
         "PORT": 5432,
     }
 }
