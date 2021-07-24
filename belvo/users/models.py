@@ -5,3 +5,6 @@ class User(models.Model):
     name = models.CharField(max_length=100)
     email = models.EmailField()
     age = models.PositiveIntegerField()
+
+    def __str__(self):
+        return str(self.id)

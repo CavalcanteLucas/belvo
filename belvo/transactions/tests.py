@@ -71,11 +71,10 @@ class TransactionTests(TestCase):
             data=TransactionSerializer(transaction_sample).data,
         )
 
-        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(1, Transaction.objects.count())
 
         expected_data = {
-            "id": 1,
             "reference": transaction_sample.reference,
             "account": transaction_sample.account,
             "date": str(transaction_sample.date),
@@ -85,7 +84,9 @@ class TransactionTests(TestCase):
             "user_id": transaction_sample.user_id.id,
         }
 
-        self.assertEqual(expected_data, response.data)
+        self.assertTrue(
+            all(item in response.data.items() for item in expected_data.items())
+        )
 
     def test_cant_create_transactions_with_repeated_reference(self):
         user = baker.make("users.User")
@@ -113,7 +114,7 @@ class TransactionTests(TestCase):
             )
 
     def test_create_bulk_transactions_successfully(self):
-        baker.make("users.User")
+        user = baker.make("users.User")
 
         self.assertEqual(0, Transaction.objects.count())
 
@@ -125,7 +126,7 @@ class TransactionTests(TestCase):
                 "amount": "2500.72",
                 "type": "inflow",
                 "category": "salary",
-                "user_id": 1,
+                "user_id": user.id,
             },
             {
                 "reference": "000053",
@@ -134,7 +135,7 @@ class TransactionTests(TestCase):
                 "amount": "-150.72",
                 "type": "outflow",
                 "category": "transfer",
-                "user_id": 1,
+                "user_id": user.id,
             },
         ]
 
@@ -146,7 +147,7 @@ class TransactionTests(TestCase):
             data=transactions_bulk_sample,
         )
 
-        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(2, Transaction.objects.count())
         self.assertEqual(2, len(response.data))
 
@@ -158,7 +159,7 @@ class TransactionTests(TestCase):
     def test_create_bulk_transactions_successfully_even_with_repeated_transactions(
         self,
     ):
-        baker.make("users.User")
+        user = baker.make("users.User")
 
         self.assertEqual(0, Transaction.objects.count())
 
@@ -170,7 +171,7 @@ class TransactionTests(TestCase):
                 "amount": "2500.72",
                 "type": "inflow",
                 "category": "salary",
-                "user_id": 1,
+                "user_id": user.id,
             },
             {
                 "reference": "000052",
@@ -179,7 +180,7 @@ class TransactionTests(TestCase):
                 "amount": "2500.72",
                 "type": "inflow",
                 "category": "salary",
-                "user_id": 1,
+                "user_id": user.id,
             },
         ]
 
@@ -191,7 +192,7 @@ class TransactionTests(TestCase):
             data=transactions_bulk_sample,
         )
 
-        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(1, Transaction.objects.count())
         self.assertEqual(1, len(response.data))
 
@@ -235,11 +236,11 @@ class TransactionTests(TestCase):
             data=[transaction_sample],
         )
 
-        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual([], response.data)
 
     def test_create_bulk_transactions_ignore_conflicts_within_bulk(self):
-        baker.make("users.User")
+        user = baker.make("users.User")
 
         self.assertEqual(0, Transaction.objects.count())
 
@@ -251,7 +252,7 @@ class TransactionTests(TestCase):
                 "amount": "-51.13",
                 "type": "outflow",
                 "category": "groceries",
-                "user_id": 1,
+                "user_id": user.id,
             },
             {
                 "reference": "000052",
@@ -260,7 +261,7 @@ class TransactionTests(TestCase):
                 "amount": "2500.72",
                 "type": "inflow",
                 "category": "salary",
-                "user_id": 1,
+                "user_id": user.id,
             },
             {
                 "reference": "000053",
@@ -269,7 +270,7 @@ class TransactionTests(TestCase):
                 "amount": "-150.72",
                 "type": "outflow",
                 "category": "transfer",
-                "user_id": 1,
+                "user_id": user.id,
             },
             {
                 "reference": "000054",
@@ -278,7 +279,7 @@ class TransactionTests(TestCase):
                 "amount": "-560.00",
                 "type": "outflow",
                 "category": "rent",
-                "user_id": 1,
+                "user_id": user.id,
             },
             {
                 "reference": "000051",
@@ -287,7 +288,7 @@ class TransactionTests(TestCase):
                 "amount": "-51.13",
                 "type": "outflow",
                 "category": "other",
-                "user_id": 1,
+                "user_id": user.id,
             },
             {
                 "reference": "000689",
@@ -296,7 +297,7 @@ class TransactionTests(TestCase):
                 "amount": "150.72",
                 "type": "inflow",
                 "category": "savings",
-                "user_id": 1,
+                "user_id": user.id,
             },
         ]
 
@@ -307,7 +308,7 @@ class TransactionTests(TestCase):
             data=transactions_bulk_sample,
         )
 
-        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(5, len(response.data))
         self.assertEqual(5, Transaction.objects.count())
 
@@ -353,7 +354,7 @@ class TransactionTests(TestCase):
                 "amount": "-51.13",
                 "type": "outflow",
                 "category": "groceries",
-                "user_id": 1,
+                "user_id": user.id,
             },
             {
                 "reference": "000052",
@@ -362,7 +363,7 @@ class TransactionTests(TestCase):
                 "amount": "2500.72",
                 "type": "inflow",
                 "category": "salary",
-                "user_id": 1,
+                "user_id": user.id,
             },
             {
                 "reference": "000053",
@@ -371,7 +372,7 @@ class TransactionTests(TestCase):
                 "amount": "-150.72",
                 "type": "outflow",
                 "category": "transfer",
-                "user_id": 1,
+                "user_id": user.id,
             },
             {
                 "reference": "000054",
@@ -380,7 +381,7 @@ class TransactionTests(TestCase):
                 "amount": "-560.00",
                 "type": "outflow",
                 "category": "rent",
-                "user_id": 1,
+                "user_id": user.id,
             },
             {
                 "reference": "000051",
@@ -389,7 +390,7 @@ class TransactionTests(TestCase):
                 "amount": "-51.13",
                 "type": "outflow",
                 "category": "other",
-                "user_id": 1,
+                "user_id": user.id,
             },
             {
                 "reference": "000689",
@@ -398,7 +399,7 @@ class TransactionTests(TestCase):
                 "amount": "150.72",
                 "type": "inflow",
                 "category": "savings",
-                "user_id": 1,
+                "user_id": user.id,
             },
         ]
 
@@ -409,7 +410,7 @@ class TransactionTests(TestCase):
             data=transactions_bulk_sample,
         )
 
-        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(4, len(response.data))
         self.assertEqual(5, Transaction.objects.count())
 

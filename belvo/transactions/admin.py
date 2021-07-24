@@ -5,6 +5,7 @@ from belvo.transactions.models import Transaction
 
 class TransactionAdmin(admin.ModelAdmin):
     list_display = [
+        "id",
         "reference",
         "account",
         "amount",
