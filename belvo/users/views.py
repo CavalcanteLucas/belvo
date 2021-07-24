@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from rest_framework import generics
 from rest_framework.response import Response
 
@@ -64,7 +66,13 @@ class UserBalanceAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         user_id = self.kwargs["pk"]
-        return Transaction.objects.filter(user_id=user_id).order_by("account")
+        start = self.request.GET.get("start", "2020-01-01")
+        end = self.request.GET.get("end", str(datetime.now().date()))
+        return (
+            Transaction.objects.filter(user_id=user_id)
+            .filter(date__range=[start, end])
+            .order_by("account")
+        )
 
 
 class UserSummaryAPIView(generics.ListAPIView):
