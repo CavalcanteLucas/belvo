@@ -2,7 +2,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 
 from belvo.users.models import User
-from belvo.users.serializers import UserSerializer, BalanceSerializer, SummarySerializer
+from belvo.users.serializers import UserSerializer, SummarySerializer
 from belvo.transactions.models import Transaction, TransactionTypes
 from belvo.transactions.serializers import TransactionSerializer
 
@@ -21,12 +21,39 @@ class UserDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 
 
 class UserBalanceAPIView(generics.ListAPIView):
-    serializer_class = BalanceSerializer
+    serializer_class = TransactionSerializer
 
     def get_result(self, data):
-        result = list(
-            {transaction["account"]: transaction for transaction in data}.values()
+        unique_transactions = list(
+            {transaction["reference"]: transaction for transaction in data}.values()
         )
+
+        unique_accounts = list({transaction["account"] for transaction in data})
+
+        amount_per_account = []
+        for account in unique_accounts:
+            amount = []
+            for transaction in unique_transactions:
+                if transaction["account"] == account:
+                    amount.append(float(transaction["amount"]))
+            amount_per_account.append({account: amount})
+
+        result = []
+        for item in amount_per_account:
+            account = list(item.keys()).pop()
+            amounts = list(item.values()).pop()
+            balance = sum(amounts)
+            total_inflow = sum(amount for amount in amounts if amount > 0)
+            total_outflow = sum(amount for amount in amounts if amount < 0)
+            result.append(
+                {
+                    "account": account,
+                    "balance": "%.2f" % balance,
+                    "total_inflow": "%.2f" % total_inflow,
+                    "total_outflow": "%.2f" % total_outflow,
+                }
+            )
+
         return result
 
     def list(self, request, *args, **kwargs):
@@ -37,7 +64,7 @@ class UserBalanceAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         user_id = self.kwargs["pk"]
-        return Transaction.objects.filter(user_id=user_id)
+        return Transaction.objects.filter(user_id=user_id).order_by("account")
 
 
 class UserSummaryAPIView(generics.ListAPIView):
