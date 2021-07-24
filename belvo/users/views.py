@@ -30,7 +30,15 @@ class UserBalanceAPIView(generics.ListAPIView):
             {transaction["reference"]: transaction for transaction in data}.values()
         )
 
-        unique_accounts = list({transaction["account"] for transaction in data})
+        unique_accounts = []
+        [
+            ""
+            for transaction in data
+            if not (
+                transaction["account"] in unique_accounts
+                or unique_accounts.append(transaction["account"])
+            )
+        ]
 
         amount_per_account = []
         for account in unique_accounts:
