@@ -64,7 +64,7 @@ test_transaction_summary_parameters = parametrize(
                 {
                     'user_email': 'janedoe@email.com',
                     'total_inflow': '2651.44',
-                    'total_outflow': '-710.72',
+                    'total_outflow': '-761.85',
                 },
                 {
                     'user_email': 'johndoe@email.com',
@@ -89,6 +89,7 @@ test_transaction_summary_by_category_parameters = parametrize(
                     'savings': '150.72',
                 },
                 'outflow': {
+                    'groceries': '-51.13',
                     'rent': '-560.00',
                     'transfer': '-150.72',
                 },

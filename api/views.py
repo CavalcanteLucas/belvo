@@ -20,25 +20,22 @@ class TransactionCreateAPIView(generics.CreateAPIView):
 
         if not isinstance(transactions_data, list):
             transactions_data = [transactions_data]
-        else:
-            transactions_data.reverse()
 
-        existing_references = set(
-            Transaction.objects.values_list('reference', flat=True)
-        )
         transactions_to_create = []
-        duplicates = []
+        transactions_duplicated = []
 
         for transaction_data in transactions_data:
-            serializer = self.get_serializer(data=transaction_data)
-            serializer.is_valid(raise_exception=True)
+            transaction_instance = Transaction.objects.filter(
+                reference=transaction_data['reference'],
+                user_email=transaction_data['user_email'],
+            ).first()
 
-            reference = serializer.validated_data['reference']
-            if reference in existing_references:
-                duplicates.append(reference)
+            if transaction_instance:
+                transactions_duplicated.append(transaction_data)
             else:
+                serializer = self.get_serializer(data=transaction_data)
+                serializer.is_valid(raise_exception=True)
                 transactions_to_create.append(serializer.validated_data)
-                existing_references.add(serializer.validated_data['reference'])
 
         if transactions_to_create:
             Transaction.objects.bulk_create(
@@ -46,14 +43,11 @@ class TransactionCreateAPIView(generics.CreateAPIView):
             )
 
         response_data = {
-            'success': True,
-            'message': 'Transaction(s) created successfully',
-            'created': [
-                transaction['reference']
-                for transaction in transactions_to_create
-            ],
-            'duplicates': duplicates,
+            'message': f'{len(transactions_to_create)} transaction(s) created',
+            'created': transactions_to_create,
+            'duplicates': transactions_duplicated,
         }
+
         return Response(response_data, status=status.HTTP_201_CREATED)
 
 

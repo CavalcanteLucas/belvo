@@ -19,7 +19,7 @@ services:
       - DB_PORT=5433
     command: >
       sh -c "make start"
-  
+
   db:
     image: postgres:13.2
     volumes:

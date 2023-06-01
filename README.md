@@ -1,6 +1,6 @@
 # Belvo Backend (API) Case Challenge
 
-This project implements an API to manage users' transactions.
+This project implements a simple API to register users' transactions and have an overview of how they are using their money.
 
 ## Running the project locally
 
@@ -15,8 +15,6 @@ You'll also need to have **PostgreSQL** installed and running. Create a database
 ```bash
 make start
 ```
-
-The project will be available at http://localhost:8000.
 
 ### Running the tests
 
@@ -36,32 +34,27 @@ Simply run the following command:
 make docker-run
 ```
 
-The project will be available at http://localhost:8000.
-
 ## API Documentation
 
 There are three endpoints available:
 
-- `POST /api/transactions/`: Creates a new transaction. The request body must contain the following fields, or a list of objects with the same fields:
-    - `reference`: The transaction reference.
+- `POST /api/transactions/`: Creates new users' transactions. The request body must contain the following fields, or a list of objects with the same fields:
+    - `reference`: The transaction reference. Must be unique and contain 6 alphanumeric digits.
     - `date`: The transaction date.
     - `amount`: The transaction amount.
     - `type`: The transaction type. Must be either **inflow** or **outflow**.
     - `category`: The transaction category.
     - `user_email`: The user email.
 
-- `GET /api/transactions/summary/type/`: Returns a summary of each user's transactions grouped by type. The response body will be a list of objects with the following fields:
+- `GET /api/transactions/summary/type/`: Returns a summary of each user's transactions grouped by type. It shows the total inflow and total outflow per user. The response body will be a list of objects with the following fields:
     - `user_email`: The user email.
     - `inflow`: The sum of all inflow transactions.
     - `outflow`: The sum of all outflow transactions.
 
-- `GET /api/transactions/summary/?user_email=<user@email.com>`: Returns a summary of the **inflow** and **outflow** transactions for the given user. The response will be an object with:
+- `GET /api/transactions/summary/?user_email=<user@email.com>`: Returns a users' summary by category that shows the sum of amounts per transaction category. The response will be an object with:
     - `inflow`: An object with the sum of transactions for each **inflow** category.
     - `outflow`: An object with the sum of transactions for each **outflow** category.
-
-
 
 ## Author
 
 Developed by [Lucas Cavalcante](https://github.com/CavalcanteLucas).
-

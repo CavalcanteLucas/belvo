@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Transaction(models.Model):
-    reference = models.CharField(max_length=6, unique=True)
+    reference = models.CharField(max_length=6)
     date = models.DateField()
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     type = models.CharField(
@@ -16,4 +16,7 @@ class Transaction(models.Model):
     user_email = models.EmailField()
 
     def __str__(self):
-        return self.reference
+        return f'<Transaction reference={self.reference} user_email={self.user_email}>'
+
+    class Meta:
+        unique_together = ('reference', 'user_email')
