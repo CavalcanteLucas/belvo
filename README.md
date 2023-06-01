@@ -2,49 +2,29 @@
 
 This project implements a simple API to register users' transactions and have an overview of how they are using their money.
 
-## Running the project locally
+## Running the project
 
-To run the project locally, you'll need to have **Python** installed. You'll also need to have **PostgreSQL** installed and running.
+To run the project locally, you'll need to have `Docker` and `docker-compose` installed.
 
-First, create an `.env` file in the project root directory. You can use the `.example.env` file as a template.
-
-Make sure to create an isolated virtual environment and activate it. Then, install the project dependencies by running:
+Simply run the following command:
 
 ```bash
-make build
-```
-
-You can run the project by executing:
-
-```bash
-make start
+make run
 ```
 
 ## Running the tests
 
-To run the tests, execute the comand:
+To exclusively run the tests, execute the comand:
 
 ```bash
 make test
 ```
 
-## Running the project locally with Docker
-
-Alternatively, to run the project locally using Docker, you need to have `Docker` and `docker-compose` installed.
-
-Simply run the following command:
-
-```bash
-make docker-run
-```
-
 ## Accessing the API
 
-The project will be served at `http://localhost:8000/`. You can access the Django admin interface at `http://localhost:8000/admin/` to manage the `Transactions`. Please notice that a superuser is required to access the admin interface.
+The project will be served at `http://localhost:8000/`. However, please notice that there is no index page available. Refer to the [API Documentation](#api-documentation) section for more information on the available routes.
 
-For convenience, a user with admin privileges will be automatically created if you have set the `DJANGO_SUPERUSER`-related environment variables in the `.env` file. Refer to the `.example.env` file for more information. The credentials for the admin user in the dockerized application are listed in the `.docker-env` file.
-
-Also notice that there is no index page available. Refer to the [API Documentation](#api-documentation) section for more information on the available routes.
+You can access the Django admin interface at `http://localhost:8000/admin/` to manage the `Transactions`. For convenience, a user with admin privileges will be automatically created with default credentials `admin:dale`.
 
 ## API Documentation
 

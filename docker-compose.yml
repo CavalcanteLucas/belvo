@@ -1,7 +1,7 @@
 version: "3.9"
 
 services:
-  web:
+  app:
     build:
       context: .
       dockerfile: Dockerfile
@@ -11,12 +11,17 @@ services:
       - "8000:8000"
     depends_on:
       - db
-    environment:
-      - DOCKER=true
     env_file:
       - .docker.env
+
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/code
     command: >
-      sh -c 'make migrate && make run'
+      sh -c 'python manage.py test'
 
   db:
     image: postgres:13.2
@@ -29,8 +34,6 @@ services:
     ports:
       - "5433:5433"
     command: -p 5433
-    expose:
-      - "5433"
 
 volumes:
   postgres_data:
