@@ -12,16 +12,18 @@ services:
     depends_on:
       - db
     environment:
-      - DB_USER=postgres
-      - DB_PASS=postgres
-      - DB_NAME=postgres
-      - DB_HOST=db
-      - DB_PORT=5433
+      - DOCKER=true
+    env_file:
+      - .docker.env
     command: >
-      sh -c "make start"
+      sh -c 'make migrate && make run'
 
   db:
     image: postgres:13.2
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     ports:

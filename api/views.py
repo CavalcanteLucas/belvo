@@ -104,12 +104,12 @@ class TransactionSummaryByCategoryForUserAPIView(generics.views.APIView):
             amount = amount.quantize(Decimal('0.00'), rounding=ROUND_DOWN)
             outflow_dict[category] = amount
 
-        serializer_data = {
+        response_data = {
             'inflow': inflow_dict,
             'outflow': outflow_dict,
         }
 
-        serializer = self.serializer_class(data=serializer_data)
+        serializer = self.serializer_class(data=response_data)
         serializer.is_valid(raise_exception=True)
 
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)

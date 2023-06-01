@@ -4,19 +4,23 @@ This project implements a simple API to register users' transactions and have an
 
 ## Running the project locally
 
-To run the project locally, you'll need to have **Python** installed. Make sure to create an isolated virtual environment and activate it. Install the project dependencies by running:
+To run the project locally, you'll need to have **Python** installed. You'll also need to have **PostgreSQL** installed and running.
+
+First, create an `.env` file in the project root directory. You can use the `.example.env` file as a template.
+
+Make sure to create an isolated virtual environment and activate it. Then, install the project dependencies by running:
 
 ```bash
-make install
+make build
 ```
 
-You'll also need to have **PostgreSQL** installed and running. Create a database and create an `.env` file in the project root directory with the content listed by the file `.example.env`. Then, run the server:
+You can run the project by executing:
 
 ```bash
 make start
 ```
 
-### Running the tests
+## Running the tests
 
 To run the tests, execute the comand:
 
@@ -26,7 +30,7 @@ make test
 
 ## Running the project locally with Docker
 
-Alternatively, to run the project locally using docker, you need to have `Docker` and `docker-compose` installed.
+Alternatively, to run the project locally using Docker, you need to have `Docker` and `docker-compose` installed.
 
 Simply run the following command:
 
@@ -34,12 +38,20 @@ Simply run the following command:
 make docker-run
 ```
 
+## Accessing the API
+
+The project will be served at `http://localhost:8000/`. You can access the Django admin interface at `http://localhost:8000/admin/` to manage the `Transactions`. Please notice that a superuser is required to access the admin interface.
+
+For convenience, a user with admin privileges will be automatically created if you have set the `DJANGO_SUPERUSER`-related environment variables in the `.env` file. Refer to the `.example.env` file for more information. The credentials for the admin user in the dockerized application are listed in the `.docker-env` file.
+
+Also notice that there is no index page available. Refer to the [API Documentation](#api-documentation) section for more information on the available routes.
+
 ## API Documentation
 
 There are three endpoints available:
 
 - `POST /api/transactions/`: Creates new users' transactions. The request body must contain the following fields, or a list of objects with the same fields:
-    - `reference`: The transaction reference. Must be unique and contain 6 alphanumeric digits.
+    - `reference`: The transaction reference. Must be unique for each `user_email` and it must contain 6 alphanumeric digits.
     - `date`: The transaction date.
     - `amount`: The transaction amount.
     - `type`: The transaction type. Must be either **inflow** or **outflow**.
