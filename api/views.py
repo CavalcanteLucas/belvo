@@ -1,7 +1,7 @@
+from decimal import Decimal, ROUND_DOWN
 from django.db.models import Sum, When, Case, DecimalField
 from rest_framework import generics, status
 from rest_framework.response import Response
-from decimal import Decimal, ROUND_DOWN
 
 from .models import Transaction
 from .serializers import (
@@ -80,6 +80,7 @@ class TransactionSummaryByTypePerUserAPIView(generics.ListAPIView):
                 )
             ),
         )
+
         return queryset
 
 

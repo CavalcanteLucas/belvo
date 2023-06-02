@@ -1,12 +1,12 @@
 # Belvo Backend (API) Case Challenge
 
-This project implements a simple API to register users' transactions and have an overview of how they are using their money.
+This project implements a simple API to register users' transactions and give an overview of how they are using their money.
 
 ## Running the project
 
 To run the project locally, you'll need to have `Docker` and `docker-compose` installed.
 
-Simply run the following command:
+Simply execute the following command:
 
 ```bash
 make run
@@ -14,7 +14,7 @@ make run
 
 ## Running the tests
 
-To exclusively run the tests, execute the comand:
+To run the tests exclusively, execute the comand:
 
 ```bash
 make test
@@ -46,6 +46,10 @@ There are three endpoints available:
 - `GET /api/transactions/summary/?user_email=<user@email.com>`: Returns a users' summary by category that shows the sum of amounts per transaction category. The response will be an object with:
     - `inflow`: An object with the sum of transactions for each **inflow** category.
     - `outflow`: An object with the sum of transactions for each **outflow** category.
+
+## Notes
+
+This assignment took me about 6~8 hours to complete.
 
 ## Author
 
