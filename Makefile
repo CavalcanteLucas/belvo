@@ -3,3 +3,6 @@ run:
 
 test:
 	docker-compose run test
+
+down:
+	docker-compose down

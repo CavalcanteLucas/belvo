@@ -9,9 +9,9 @@ WORKDIR /code
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
-COPY entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/entrypoint.sh
+COPY create_super_user.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/create_super_user.sh
 
 COPY . .
 
-CMD ["sh", "-c", "python manage.py migrate && ./entrypoint.sh && python manage.py runserver 0.0.0.0:8000"]
+CMD ["sh", "-c", "python manage.py migrate && ./create_super_user.sh && python manage.py runserver 0.0.0.0:8000"]
